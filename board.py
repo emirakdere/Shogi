@@ -10,7 +10,7 @@ class Board:
         self._board = self._initEmptyBoard()
         
 
-    def _initEmptyBoard(self):
+    def _initEmptyBoard(self):  
         # TODO: Initalize empty board
         return [[None] * 5 for _ in range(5)]
 
