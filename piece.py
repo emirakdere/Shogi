@@ -3,21 +3,21 @@ class Piece:
     Class that represents a BoxShogi piece
     """
 
-    def __init__(self, name, arrayLoc, originalOwner):
+    def __init__(self, name):
         self.name = name
-        self.arrayLoc = arrayLoc
-        #self.controller = originalOwner
-        self.originalOwner = originalOwner
 
     def __repr__(self):
-        return self.name# + ", " + str(self.arrayLoc)
+        return self.name
     
-    #def getMoves()
     def isOpponentPiece(self, otherPiece):
         if self.name.islower():
             return otherPiece.name.isupper()
         else:
             return otherPiece.name.islower()
+
+    def ownerOfPiece(self):
+        return self.name[-1].isupper() * 1
+        
 
     def maxRange(self):
         drive = [[(0, 1)],[[1, 0]],[[0, -1]],[[-1, 0]],[[1, 1]],[[1, -1]],[[-1, -1]],[[-1, 1]]]
@@ -37,7 +37,7 @@ class Piece:
         relay = [[[-1,-1]], [[-1,1]], [[0,1]], [[1,1]], [[1,-1]]]
 
 
-        if self.name[-1].upper() == "D": # Queen
+        if self.name[-1].upper() == "D": # King
             return drive
         if self.name[-1].upper() == "N": # Rook
             return notes if self.name[0] != '+' else notes + drive
