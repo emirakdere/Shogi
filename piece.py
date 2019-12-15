@@ -32,10 +32,15 @@ class Piece:
                       [[-1,-1], [-2,-2], [-3,-3], [-4,-4]],\
                       [[-1, 1], [-2, 2], [-3, 3], [-4, 4]]]
  
-        shield = [[[-1,0]], [[-1,1]], [[0,1]], [[1,1]], [[1,0]], [[0,-1]]]
+        shieldLower = [[[-1,0]], [[-1,1]], [[0, 1]], [[1,  1]], [[1, 0]], [[0,-1]]]
+        shieldUpper = [[[1, 0]], [[1,-1]], [[0,-1]], [[-1,-1]], [[-1,0]], [[0, 1]]]
+        shieldOptions = [shieldLower, shieldUpper]
 
-        relay = [[[-1,-1]], [[-1,1]], [[0,1]], [[1,1]], [[1,-1]]]
-
+        relayLower = [[[-1,-1]], [[-1,1]], [[0, 1]], [[1,  1]], [[1,-1]]]
+        relayUpper = [[[1,  1]], [[1,-1]], [[0,-1]], [[-1,-1]], [[-1,1]]]
+        relayOptions = [relayLower, relayUpper]
+        
+        player = self.name[-1].isupper()
 
         if self.name[-1].upper() == "D": # King
             return drive
@@ -44,11 +49,11 @@ class Piece:
         if self.name[-1].upper() == "G": # Bishop
             return governence if self.name[0] != '+' else governence + drive
         if self.name[-1].upper() == "S":
-            return shield
+            return shieldOptions[player]
         if self.name[-1].upper() == "R":
-            return relay if self.name[0] != '+' else shield
+            return relayOptions[player] if self.name[0] != '+' else shieldOptions[player]
         if self.name[-1].upper() == "P":
-            return [[[0, 1]]] if self.name[0] != '+' else shield
+            return [[[[0, 1]]],[[[0, -1]]]][player] if self.name[0] != '+' else shieldOptions[player]
 
 
 

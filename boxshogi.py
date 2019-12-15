@@ -33,7 +33,6 @@ class Game:
             pieceStr = piecePositionDic['piece']
             positionStr = piecePositionDic['position']
 
-            owner = pieceStr[-1].isupper() * 1
             x, y = self.translateBoardLoc(positionStr)
 
             pieceObject = Piece(pieceStr)
@@ -47,6 +46,7 @@ class Game:
 
 
     def print(self):
+        #print("") # TODO: DELETE THIS!!!!!!!!!!
         print(self.state)
         print("Captures UPPER:", end="")
         for piece in self.grave[UPPER]:
@@ -85,15 +85,14 @@ class Game:
                             moveAsStr = self.translateArrayIndex(move)
                             if not self.inCheckAfterAction(MOVE, [char + num, moveAsStr]):
                                 possibleActions.append("move " + char + num + " " + moveAsStr)
-                else:
-                    for capturedPiece in self.grave[self.turn]:
-                        legalDrops = self.getLegalDrops(capturedPiece)
-                        for drop in legalDrops:
-                            dropAsStr = self.translateArrayIndex(drop)
-                            if not self.inCheckAfterAction(DROP, [capturedPiece.name, char + num]):
-                                possibleActions.append("drop " + capturedPiece.name + " " + char + num)
+        for capturedPiece in self.grave[self.turn]:
+            legalDrops = self.getLegalDrops(capturedPiece.name)
+            for drop in legalDrops:
+                dropAsStr = self.translateArrayIndex(drop)
+                if not self.inCheckAfterAction(DROP, [capturedPiece.name, char + num]):
+                    possibleActions.append("drop " + capturedPiece.name.lower() + " " + dropAsStr)
 
-        print(possibleActions)
+        #print(possibleActions)
         return possibleActions
 
 
@@ -107,14 +106,14 @@ class Game:
         pieceInDesiredLoc = self.getPieceInLoc(newLoc)
         
         if pieceToMove == None: # move nonexistent piece
-            print(1)
+            #print(1)
             self.setIllegalMoveVariables()
             return
 
         ownerOfMovedPiece = pieceToMove.ownerOfPiece()
 
         if ownerOfMovedPiece != self.turn:
-            print(2)
+            #print(2)
             self.setIllegalMoveVariables()
             return
 
@@ -122,7 +121,7 @@ class Game:
         legalMoves = self.getLegalMoves(oldLoc)
         
         if desiredLoc not in legalMoves: # move to illegal location
-            print(3)
+            #print(3)
             self.setIllegalMoveVariables()
             return
 
@@ -136,7 +135,7 @@ class Game:
 
                 pieceToMove.name = "+" + pieceToMove.name
             else:
-                print(4)
+                #print(4)
                 self.setIllegalMoveVariables()
                 return
 
@@ -171,13 +170,13 @@ class Game:
         # dropping piece that you have not captured
         matchingPiecesInGrave = list(filter(lambda elt: elt.name == pieceChar, self.grave[self.turn]))
         if matchingPiecesInGrave == []: # CHECK THIS
-            print(5)
+            #print(5)
             self.setIllegalMoveVariables()
             return
         legalDrops = self.getLegalDrops(pieceChar)
         desiredLoc = tuple(self.translateBoardLoc(locStr))
         if desiredLoc not in legalDrops:
-            print(6)
+            #print(6)
             self.setIllegalMoveVariables()
             return
         else:
@@ -343,8 +342,13 @@ def driver(isInteractive, dicOfInitialState):
         if gameBoard.turn == LOWER:
             lowerInCheck = gameBoard.check(LOWER)
             if lowerInCheck:
-                possibleActions = gameBoard.getActionsWhenChecked()
-                if possibleActions == []:
+                if possibleActions != []:
+                    possibleActions = gameBoard.getActionsWhenChecked()
+                    print("lower player is in check!")
+                    print("Available moves:")
+                    for act in possibleActions:
+                        print(act)
+                else:
                     gameBoard.finished == UPPER_WON_CHECKMATE
                     break
             action = input("lower> ")
@@ -358,14 +362,19 @@ def driver(isInteractive, dicOfInitialState):
             upperInCheck = gameBoard.check(UPPER)
             if upperInCheck:
                 possibleActions = gameBoard.getActionsWhenChecked()
-                if possibleActions == []:
-                    print(7)
+                if possibleActions != []:
+                    possibleActions = gameBoard.getActionsWhenChecked()
+                    print("UPPER player is in check!")
+                    print("Available moves:")
+                    for act in possibleActions:
+                        print(act)
+                else:
                     gameBoard.finished == LOWER_WON_CHECKMATE
                     break
             action = input("UPPER> ")
             if upperInCheck:
                 if action not in possibleActions:
-                    print(8)
+                    #print(8)
                     gameBoard.finished = LOWER_WON_ILLEGAL_MOVE
                     break
             gameBoard.executeAction(action)
