@@ -14,7 +14,6 @@ LOWER_WON_ILLEGAL_MOVE = 3
 UPPER_WON_ILLEGAL_MOVE = 4
 
 
-
 promotionZones = {UPPER:{"a1", "b1", "c1", "d1", "e1"}, \
                   LOWER:{"a5", "b5", "c5", "d5", "e5"}}
 
@@ -25,6 +24,7 @@ class Game:
         self.turn = LOWER
         self.state = Board()
         self.grave = [[], []]
+        self.printBuffer = []
         self.buildBoard(buildInstructions)
 
     def buildBoard(self, buildInstructions):
@@ -46,16 +46,16 @@ class Game:
 
 
     def print(self):
-        #print("") # TODO: DELETE THIS!!!!!!!!!!
-        print(self.state)
-        print("Captures UPPER:", end="")
+        
+        self.printBuffer.append(self.state.__repr__() + '\n')
+        self.printBuffer.append("Captures UPPER:")
         for piece in self.grave[UPPER]:
-            print(" " + piece.name, end="")
-        print("")
-        print("Captures lower:", end="")
+            self.printBuffer.append(" " + piece.name)
+        self.printBuffer.append('\n')
+        self.printBuffer.append("Captures lower:")
         for piece in self.grave[LOWER]:
-            print(" " + piece.name, end="")
-        print("")
+            self.printBuffer.append(" " + piece.name)
+        self.printBuffer.append('\n\n')
 
 
     def executeAction(self, action):
@@ -93,7 +93,7 @@ class Game:
                     possibleActions.append("drop " + capturedPiece.name.lower() + " " + dropAsStr)
 
         #print(possibleActions)
-        return possibleActions
+        return sorted(possibleActions)
 
 
 
@@ -183,7 +183,7 @@ class Game:
             pieceToDrop = matchingPiecesInGrave[0]
             self.changeSquare(locStr, pieceToDrop)
             self.grave[self.turn].remove(pieceToDrop)
-
+        self.numOfMoves += 1
 
 
     def setIllegalMoveVariables(self):
@@ -330,56 +330,66 @@ class Game:
         return [upperControls, lowerControls, lowerDLocation, upperDLocation]
 
 
+def executeTurn(gameBoard, isInteractive, rules, actionPointer):
+            
+    inCheck = gameBoard.check(gameBoard.turn)
+    playerStr = "lower" if gameBoard.turn == LOWER else "UPPER"
+    
+    if inCheck:
+        possibleActions = gameBoard.getActionsWhenChecked()
+        if possibleActions != []:
+            
+            gameBoard.printBuffer.append(playerStr + " player is in check!" + '\n')
+            gameBoard.printBuffer.append("Available moves:" + '\n')
+            for act in possibleActions:
+                gameBoard.printBuffer.append(act + '\n')
+        else:
+            gameBoard.finished = UPPER_WON_CHECKMATE if gameBoard.turn == LOWER else LOWER_WON_CHECKMATE
+            
+    if gameBoard.finished == NO_CHECKMATE:
+        gameBoard.printBuffer.append(playerStr + "> ")
+        if isInteractive:
+            
+            print(''.join(gameBoard.printBuffer), flush=True, end="")
+            action = input()
+            gameBoard.printBuffer = []
+            gameBoard.printBuffer.append(playerStr + " player action: " + action + "\n")
+
+            
+            
+            
+        else:
+            action = rules[gameBoard.numOfMoves]
+            gameBoard.printBuffer = []
+            gameBoard.printBuffer.append(playerStr + " player action: " + action + "\n")
+            
+        
+        
+        if inCheck:
+            if action not in possibleActions:
+                gameBoard.finished = UPPER_WON_ILLEGAL_MOVE if gameBoard.turn == LOWER else UPPER_WON_ILLEGAL_MOVE
+        if gameBoard.finished == NO_CHECKMATE:
+            
+            gameBoard.executeAction(action)
+            gameBoard.turn = (not gameBoard.turn) * 1
 
 def driver(isInteractive, dicOfInitialState):
     gameBoard = Game(dicOfInitialState)
-    while (not gameBoard.finished) and (gameBoard.numOfMoves < 200):
-        possibleActions = []
+    actionPointer = [None]
+    moveList = None if isInteractive else dicOfInitialState['moves']
+    
+    while ((not gameBoard.finished) and (gameBoard.numOfMoves < 200)) and \
+           (isInteractive or gameBoard.numOfMoves < len(moveList)):
+        gameBoard.print()
+        executeTurn(gameBoard, isInteractive, moveList, actionPointer)
 
-        if isInteractive:
-            gameBoard.print()
-
-        if gameBoard.turn == LOWER:
-            lowerInCheck = gameBoard.check(LOWER)
-            if lowerInCheck:
-                if possibleActions != []:
-                    possibleActions = gameBoard.getActionsWhenChecked()
-                    print("lower player is in check!")
-                    print("Available moves:")
-                    for act in possibleActions:
-                        print(act)
-                else:
-                    gameBoard.finished == UPPER_WON_CHECKMATE
-                    break
-            action = input("lower> ")
-            if lowerInCheck:
-                if action not in possibleActions:
-                    gameBoard.finished = UPPER_WON_ILLEGAL_MOVE
-                    break
-            gameBoard.executeAction(action)
-            gameBoard.turn = UPPER
-        elif gameBoard.turn == UPPER:
-            upperInCheck = gameBoard.check(UPPER)
-            if upperInCheck:
-                possibleActions = gameBoard.getActionsWhenChecked()
-                if possibleActions != []:
-                    possibleActions = gameBoard.getActionsWhenChecked()
-                    print("UPPER player is in check!")
-                    print("Available moves:")
-                    for act in possibleActions:
-                        print(act)
-                else:
-                    gameBoard.finished == LOWER_WON_CHECKMATE
-                    break
-            action = input("UPPER> ")
-            if upperInCheck:
-                if action not in possibleActions:
-                    #print(8)
-                    gameBoard.finished = LOWER_WON_ILLEGAL_MOVE
-                    break
-            gameBoard.executeAction(action)
-            gameBoard.turn = LOWER
-
+    
+        
+    if not isInteractive:
+        print(''.join(gameBoard.printBuffer), flush=True)
+        print(gameBoard.state)
+    
+    
     if gameBoard.finished == UPPER_WON_CHECKMATE:
         print("UPPER player wins. Checkmate.")
     elif gameBoard.finished == LOWER_WON_CHECKMATE:
@@ -388,8 +398,10 @@ def driver(isInteractive, dicOfInitialState):
         print("UPPER player wins. Illegal move.")
     elif gameBoard.finished == LOWER_WON_ILLEGAL_MOVE:
         print("lower player wins. Illegal move.")
-    else:
+    elif gameBoard.numOfMoves == 200:
         print("Tie game. Too many moves.")
+    
+    
 
 
 def main():
@@ -412,15 +424,15 @@ def main():
                                     'upperCaptures': [], 'lowerCaptures': []}
 
             driver(True, initialBoardState)
-            #gameBoard.print()   
-
             
     elif len(sys.argv) == 3:
         if sys.argv[1] == "-f":
-            testCase = utils.parseTestCase(sys.argv[2])
+            #testCase = utils.parseTestCase(sys.argv[2])
+            #print(testCase)
+            testCase = {'initialPieces': [{'piece': 'd', 'position': 'a1'}, {'piece': 'D', 'position': 'e5'}, {'piece': '+G', 'position': 'c4'}, {'piece': '+r', 'position': 'c1'}], 'upperCaptures': ['S', 'G', 'N', 'P', 'P', 'N', 'R', 'S'], 'lowerCaptures': [], 'moves': ['move c1 d1', 'move c4 c3']}
+
             
             driver(False, testCase)
-            #gameBoard.print()
 
     else:
         raise Exception("Invalid game mode specification.")
