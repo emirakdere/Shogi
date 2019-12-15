@@ -66,7 +66,7 @@ class Game:
             if len(actionArgv) == 4 and actionArgv[3] == "promote":
                 self.move(actionArgv[1], actionArgv[2], True)
             else:
-                self.move(actionArgv[1], actionArgv[2], False) #move
+                self.move(actionArgv[1], actionArgv[2], False)
         elif actionArgv[0] == "drop":
             self.drop(actionArgv[1], actionArgv[2])
         else:
@@ -92,8 +92,6 @@ class Game:
                 dropAsStr = self.translateArrayIndex(drop)
                 if not self.inCheckAfterAction(DROP, [capturedPiece.name, dropAsStr], player):
                     possibleActions.append("drop " + capturedPiece.name.lower() + " " + dropAsStr)
-
-        #print(possibleActions)
         return sorted(possibleActions)
 
 
@@ -107,14 +105,12 @@ class Game:
         pieceInDesiredLoc = self.getPieceInLoc(newLoc)
         
         if pieceToMove == None: # move nonexistent piece
-            #print(1)
             self.setIllegalMoveVariables()
             return
 
         ownerOfMovedPiece = pieceToMove.ownerOfPiece()
 
         if ownerOfMovedPiece != self.turn:
-            #print(2)
             self.setIllegalMoveVariables()
             return
 
@@ -122,7 +118,6 @@ class Game:
         legalMoves = self.getLegalMoves(oldLoc)
         
         if desiredLoc not in legalMoves: # move to illegal location
-            #print(3)
             self.setIllegalMoveVariables()
             return
 
@@ -140,7 +135,6 @@ class Game:
 
                 pieceToMove.name = "+" + pieceToMove.name
             else:
-                #print(4)
                 self.setIllegalMoveVariables()
                 return
 
@@ -148,8 +142,6 @@ class Game:
         elif pieceToMove.name.upper() == "P" and mvmtInvolvingPromotionZone: 
             pieceToMove.name = "+" + pieceToMove.name
 
-
-        
         # in case of a capture, move piece to the capturer's grave
         if pieceInDesiredLoc != None: 
             
@@ -174,14 +166,12 @@ class Game:
 
         # dropping piece that you have not captured
         matchingPiecesInGrave = list(filter(lambda elt: elt.name == pieceChar, self.grave[self.turn]))
-        if matchingPiecesInGrave == []: # CHECK THIS
-            #print(5)
+        if matchingPiecesInGrave == []:
             self.setIllegalMoveVariables()
             return
         legalDrops = self.getLegalDrops(pieceChar)
         desiredLoc = tuple(self.translateBoardLoc(locStr))
         if desiredLoc not in legalDrops:
-            #print(6)
             self.setIllegalMoveVariables()
             return
         else:
@@ -198,7 +188,7 @@ class Game:
             self.finished = LOWER_WON_ILLEGAL_MOVE
         
     def translateBoardLoc(self, charNum): 
-    #translates the board location (i.e. 5e) into array-index format
+    #translates the board location (i.e. e5) into array-index format
         char, num = charNum
         y = int(num) - 1
         x = ord(char) - ord("a")
@@ -243,7 +233,6 @@ class Game:
 
         # I don't have to consider promoting
         checkAfterAction = False
-        #print(action, arguments, '\n', self.state)
         if action == MOVE:
             startLoc, endLoc = arguments
             pieceToMove = self.getPieceInLoc(startLoc)
@@ -308,11 +297,9 @@ class Game:
     def check(self, player):
         controledAndDriveLocs = self.allControlledSquares()
         if controledAndDriveLocs[player + 2] in controledAndDriveLocs[player]:
-            return True # TODO
+            return True
         else:
             return False
-
-
 
     def allControlledSquares(self):
         lowerControls = set()
@@ -335,11 +322,6 @@ class Game:
         return [upperControls, lowerControls, lowerDLocation, upperDLocation]
 
 
-
-
-
-
-
 def executeTurn(gameBoard, isInteractive, rules):
     
     inCheck = gameBoard.check(gameBoard.turn)
@@ -352,13 +334,10 @@ def executeTurn(gameBoard, isInteractive, rules):
         possibleActions = gameBoard.getActionsWhenChecked(gameBoard.turn)
         if possibleActions != []:
             
-            #print(playerStr + " player is in check!")
-            #print("Available moves:")
             if isInteractive:
                 print(playerStr + " player is in check!" + '\n' + "Available moves:")
                 for act in possibleActions:
                     print(act)
-                    #gameBoard.printBuffer.append(act + '\n')
         else:
             gameBoard.finished = UPPER_WON_CHECKMATE if gameBoard.turn == LOWER else LOWER_WON_CHECKMATE
             
@@ -366,31 +345,22 @@ def executeTurn(gameBoard, isInteractive, rules):
         
         if isInteractive:
             
-            print(playerStr + "> ", flush=True, end="")
-            #gameBoard.printBuffer.append(playerStr + "> ")
-            
+            print(playerStr + "> ", flush=True, end="")            
             
             action = input()
             
         else:
-            # print(''.join(gameBoard.printBuffer), flush=True, end="")
             action = rules[gameBoard.numOfMoves]
             
         gameBoard.prevMove = action
 
         if inCheck:
             if action not in possibleActions:
-                #gameBoard.printBuffer[0] = (playerStr + " player action: " + gameBoard.prevMove + '\n')
                 gameBoard.finished = UPPER_WON_ILLEGAL_MOVE if gameBoard.turn == LOWER else UPPER_WON_ILLEGAL_MOVE
         if gameBoard.finished == NO_CHECKMATE:
             
             gameBoard.executeAction(action)
-            #gameBoard.printBuffer[0] = (playerStr + " player action: " + gameBoard.prevMove + '\n')
             gameBoard.turn = (not gameBoard.turn) * 1
-                
-
-    #return gameBoard.printBuffer
-
 
 
 def driver(isInteractive, dicOfInitialState):
@@ -400,8 +370,6 @@ def driver(isInteractive, dicOfInitialState):
     
     while ((not gameBoard.finished) and (gameBoard.numOfMoves < 400)) and \
            (isInteractive or gameBoard.numOfMoves < len(moveList)):
-        #print(gameBoard.numOfMoves)
-        #print(gameBoard.state)
         executeTurn(gameBoard, isInteractive, moveList)
         
         
@@ -450,7 +418,6 @@ def driver(isInteractive, dicOfInitialState):
                     print("Available moves:")
                     for act in possibleActions:
                         print(act)
-                    
                 else:
                     lastLine = True
                     if gameBoard.turn == LOWER:
@@ -486,24 +453,11 @@ def main():
     elif len(sys.argv) == 3:
         if sys.argv[1] == "-f":
             testCase = utils.parseTestCase(sys.argv[2])
-            #print(testCase)
-            #testCase = {'initialPieces': [{'piece': 'd', 'position': 'a1'}, {'piece': 'D', 'position': 'e5'}, {'piece': '+G', 'position': 'c4'}, {'piece': '+r', 'position': 'c1'}], 'upperCaptures': ['S', 'G', 'N', 'P', 'P', 'N', 'R', 'S'], 'lowerCaptures': [], 'moves': ['move c1 d1', 'move c4 c3']}
-
             
             driver(False, testCase)
 
     else:
         raise Exception("Invalid game mode specification.")
         
-#        
-#    testCase = utils.parseTestCase("cases/manyWaysOutOfCheck.in")
-#    print(testCase)
-#    driver(False, testCase)
-
-
-# TODO: Pinning (I currently don't check if moving a piece brings me to check)
-
-
 if __name__ == "__main__":
     main()
-
