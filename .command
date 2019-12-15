@@ -1,0 +1,1 @@
+python boxshogi.py -f

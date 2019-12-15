@@ -126,6 +126,10 @@ class Game:
             self.setIllegalMoveVariables()
             return
 
+        if self.inCheckAfterAction(MOVE, [oldLoc, newLoc], self.turn): # moving pinned piece
+            self.setIllegalMoveVariables()
+            return
+
 
         # PROMOTION
         mvmtInvolvingPromotionZone = (newLoc in promotionZones[self.turn] or oldLoc in promotionZones[self.turn])
@@ -419,37 +423,43 @@ def driver(isInteractive, dicOfInitialState):
         print("UPPER player wins.  Illegal move.", end='')
     elif gameBoard.finished == LOWER_WON_ILLEGAL_MOVE:
         print("lower player wins.  Illegal move.", end='')
-    elif gameBoard.numOfMoves == 400:
-        print("Tie game.  Too many moves.", end='')
     else:
+        
         lastMovedPlayer = (not gameBoard.turn) * 1
         
         inCheck = gameBoard.check(gameBoard.turn)
         playerStr = "lower" if lastMovedPlayer == LOWER else "UPPER"
         currPlayerStr = "lower" if lastMovedPlayer == UPPER else "UPPER"
-
-
-        print(playerStr + " player action: " + gameBoard.prevMove)
-        gameBoard.print()
         lastLine = False
-        if inCheck:
-            possibleActions = gameBoard.getActionsWhenChecked(gameBoard.turn)
-            if possibleActions != []:
-                
-                print(currPlayerStr + " player is in check!")
-                print("Available moves:")
-                for act in possibleActions:
-                    print(act)
-                
+        
+        if gameBoard.finished == TIE_GAME:
+            if inCheck:
+                possibleActions = gameBoard.getActionsWhenChecked(gameBoard.turn)
+                if possibleActions == []:
+                    print(playerStr + " player wins.  Checkmate.", end='')
             else:
-                lastLine = True
-                if gameBoard.turn == LOWER:
-                    print("UPPER player wins.  Checkmate.", end='')
-                elif gameBoard.turn == UPPER:
-                    print("lower player wins.  Checkmate.", end='')
+                print("Tie game.  Too many moves.", end='')
+        else:
+            print(playerStr + " player action: " + gameBoard.prevMove)
+            gameBoard.print()
+            if inCheck:
+                possibleActions = gameBoard.getActionsWhenChecked(gameBoard.turn)
+                if possibleActions != []:
                     
-        if not lastLine:
-            print(currPlayerStr + "> ", flush=True, end="")
+                    print(currPlayerStr + " player is in check!")
+                    print("Available moves:")
+                    for act in possibleActions:
+                        print(act)
+                    
+                else:
+                    lastLine = True
+                    if gameBoard.turn == LOWER:
+                        print("UPPER player wins.  Checkmate.", end='')
+                    elif gameBoard.turn == UPPER:
+                        print("lower player wins.  Checkmate.", end='')
+                        
+            if not lastLine:
+                print(currPlayerStr + "> ", flush=True, end="")
     
 
 def main():
