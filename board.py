@@ -1,5 +1,6 @@
 import os
 import piece
+from globalVars import BOARD_SIZE
 
 
 class Board:
@@ -11,8 +12,7 @@ class Board:
         
 
     def _initEmptyBoard(self):  
-        # TODO: Initalize empty board
-        return [[None] * 5 for _ in range(5)]
+        return [[None] * BOARD_SIZE for _ in range(BOARD_SIZE)]
 
     def __repr__(self):
         return self._stringifyBoard()

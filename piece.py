@@ -20,7 +20,12 @@ class Piece:
         
 
     def maxRange(self):
-        drive = [[(0, 1)],[[1, 0]],[[0, -1]],[[-1, 0]],[[1, 1]],[[1, -1]],[[-1, -1]],[[-1, 1]]]
+        # maximum possible delta_X and delta_Y the pieces can move in.
+        # the ones that are earlier in their respective lists are closer 
+        # to the piece. See the first list of notes below for an example.
+
+
+        drive = [[[0, 1]],[[1, 0]],[[0, -1]],[[-1, 0]],[[1, 1]],[[1, -1]],[[-1, -1]],[[-1, 1]]]
 
         notes = [[[1, 0], [2, 0], [3, 0], [4, 0]],\
                  [[-1,0], [-2,0], [-3,0], [-4,0]],\
@@ -32,6 +37,7 @@ class Piece:
                       [[-1,-1], [-2,-2], [-3,-3], [-4,-4]],\
                       [[-1, 1], [-2, 2], [-3, 3], [-4, 4]]]
  
+        # Have to divide shield and relay into cases because they are not symmetric wrt x axis
         shieldLower = [[[-1,0]], [[-1,1]], [[0, 1]], [[1,  1]], [[1, 0]], [[0,-1]]]
         shieldUpper = [[[1, 0]], [[1,-1]], [[0,-1]], [[-1,-1]], [[-1,0]], [[0, 1]]]
         shieldOptions = [shieldLower, shieldUpper]
