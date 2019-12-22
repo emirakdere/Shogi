@@ -1,5 +1,7 @@
 # box-take-home
 
+Implementation of the backend of a chess-like game. Enjoy!
+
 ## Files and Classes
 
 ### Classes
