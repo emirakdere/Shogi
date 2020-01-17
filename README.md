@@ -1,4 +1,4 @@
-# box-take-home
+# Modified Chess Game
 
 Implementation of the backend of a chess-like game. Enjoy!
 
@@ -13,14 +13,14 @@ Implementation of the backend of a chess-like game. Enjoy!
 ### Other Files
 - boxshogi.py
 	- includes main(), the turn executer and the driver function
-- utils.py (given by Box)
-	- includes a file parser for test cases given by box
-- cases (given by Box)
-	- test cases
+;- utils.py (given by Box)
+;	- includes a file parser for test cases given by box
+;- cases (given by Box)
+;	- test cases
 - globalVars.py
 	- relevant global variables used by multiple files, especially game.py and boxshogi.py
 
-## How to Run the Code
-1. Download .zip file, and open it. 
-2. cd to the file created when zip was opened.
-3. Run the command: ./test-runner-mac
+;## How to Run the Code
+;1. Download .zip file, and open it. 
+;2. cd to the file created when zip was opened.
+;3. Run the command: ./test-runner-mac
