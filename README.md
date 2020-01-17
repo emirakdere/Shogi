@@ -28,3 +28,4 @@ Implementation of the backend of a chess-like game. Enjoy!
 ;2. cd to the file created when zip was opened.
 ;3. Run the command: ./test-runner-mac
 --->
+## Running the code
