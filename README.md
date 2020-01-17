@@ -5,8 +5,8 @@ Implementation of the backend of a chess-like game. Enjoy!
 ## Files and Classes
 
 ### Classes
-- _Piece_ from _piece.py_ (given by Box [slightly modified])
-- _Board_ from _board.py_ (given by Box [slightly modified])
+- _Piece_ from _piece.py_ ;(given by Box [slightly modified])
+- _Board_ from _board.py_ ;(given by Box [slightly modified])
 - _Game_ from _game.py_
 	- class that makes the communication between _Piece_ and _Board_ possible
 
