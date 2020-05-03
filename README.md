@@ -1,6 +1,6 @@
 # Modified Chess Game
 
-Implementation of the backend of a chess-like game. Enjoy!
+Implementation of the backend of a chess-like game.
 
 ## Files and Classes
 
